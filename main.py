@@ -31,13 +31,16 @@ st.markdown("""
     background:white;
     border-radius:18px;
     padding:20px;
-    font-size:36px;
+    font-size:48px;
     font-weight:600;
     text-align:right;
     box-shadow:0 5px 15px rgba(0,0,0,.15);
     margin-bottom:25px;
-    min-height:75px;
+    min-height:95px;
     overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
 }
 
 /* 버튼 */
