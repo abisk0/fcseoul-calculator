@@ -1,72 +1,217 @@
 import streamlit as st
 import math
 
-st.set_page_config(page_title="고급 계산기", page_icon="🧮")
-
-st.title("🧮 고급 계산기")
-
-# 연산 선택
-operation = st.selectbox(
-    "연산을 선택하세요",
-    (
-        "덧셈",
-        "뺄셈",
-        "곱셈",
-        "나눗셈",
-        "모듈러 연산",
-        "지수 연산",
-        "로그 연산"
-    )
+st.set_page_config(
+    page_title="Modern Calculator",
+    page_icon="🧮",
+    layout="centered"
 )
 
-# 로그 연산은 입력 방식이 다름
-if operation == "로그 연산":
-    x = st.number_input("진수 x", value=10.0)
-    base = st.number_input("밑(base)", value=10.0)
+# ------------------------
+# CSS
+# ------------------------
+st.markdown("""
+<style>
 
-    if st.button("계산"):
+.stApp{
+    background:#f3f4f6;
+}
+
+.title{
+    text-align:center;
+    font-size:42px;
+    font-weight:700;
+    color:#222;
+    margin-bottom:25px;
+}
+
+.display{
+    background:white;
+    border-radius:15px;
+    padding:18px;
+    font-size:34px;
+    text-align:right;
+    box-shadow:0 3px 12px rgba(0,0,0,.12);
+    margin-bottom:20px;
+    min-height:70px;
+    overflow:hidden;
+}
+
+.stButton>button{
+    width:100%;
+    height:70px;
+    border-radius:14px;
+    border:none;
+    font-size:22px;
+    font-weight:bold;
+    background:#ffffff;
+    color:#333;
+    transition:0.2s;
+    box-shadow:0 2px 5px rgba(0,0,0,.12);
+}
+
+.stButton>button:hover{
+    background:#4f8bf9;
+    color:white;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="title">🧮 Modern Calculator</div>', unsafe_allow_html=True)
+
+# ------------------------
+# Session State
+# ------------------------
+
+if "expression" not in st.session_state:
+    st.session_state.expression = ""
+
+if "result" not in st.session_state:
+    st.session_state.result = ""
+
+
+# ------------------------
+# Functions
+# ------------------------
+
+def add(char):
+    st.session_state.expression += char
+
+
+def clear():
+    st.session_state.expression = ""
+    st.session_state.result = ""
+
+
+def back():
+    st.session_state.expression = st.session_state.expression[:-1]
+
+
+def calculate():
+    expr = st.session_state.expression
+
+    expr = expr.replace("^", "**")
+
+    try:
+        result = eval(expr)
+
+        st.session_state.result = str(result)
+        st.session_state.expression = str(result)
+
+    except Exception:
+        st.session_state.result = "Error"
+
+
+def log10():
+    try:
+        value = float(st.session_state.expression)
+
+        result = math.log10(value)
+
+        st.session_state.result = str(result)
+        st.session_state.expression = str(result)
+
+    except:
+        st.session_state.result = "Error"
+
+
+def ln():
+    try:
+        value = float(st.session_state.expression)
+
+        result = math.log(value)
+
+        st.session_state.result = str(result)
+        st.session_state.expression = str(result)
+
+    except:
+        st.session_state.result = "Error"
+
+
+# ------------------------
+# Display
+# ------------------------
+
+display = st.session_state.expression
+
+if display == "":
+    display = "0"
+
+st.markdown(
+    f'<div class="display">{display}</div>',
+    unsafe_allow_html=True
+)
+
+# ------------------------
+# Button Layout
+# ------------------------
+
+rows = [
+    ["C","⌫","%","/"],
+    ["7","8","9","*"],
+    ["4","5","6","-"],
+    ["1","2","3","+"],
+    ["0",".","^","="]
+]
+
+for row in rows:
+
+    cols = st.columns(4)
+
+    for i,key in enumerate(row):
+
+        with cols[i]:
+
+            if st.button(key):
+
+                if key == "C":
+                    clear()
+
+                elif key == "⌫":
+                    back()
+
+                elif key == "=":
+                    calculate()
+
+                else:
+                    add(key)
+
+# ------------------------
+# Scientific Buttons
+# ------------------------
+
+st.write("")
+
+col1,col2,col3 = st.columns(3)
+
+with col1:
+
+    if st.button("log10"):
+        log10()
+
+with col2:
+
+    if st.button("ln"):
+        ln()
+
+with col3:
+
+    if st.button("√"):
+
         try:
-            if x <= 0:
-                st.error("진수는 0보다 커야 합니다.")
-            elif base <= 0 or base == 1:
-                st.error("밑은 0보다 크고 1이 아니어야 합니다.")
-            else:
-                result = math.log(x, base)
-                st.success(f"결과: {result}")
-        except Exception as e:
-            st.error(f"오류 발생: {e}")
 
-else:
-    num1 = st.number_input("첫 번째 숫자", value=0.0)
-    num2 = st.number_input("두 번째 숫자", value=0.0)
+            value=float(st.session_state.expression)
 
-    if st.button("계산"):
-        try:
-            if operation == "덧셈":
-                result = num1 + num2
+            result=math.sqrt(value)
 
-            elif operation == "뺄셈":
-                result = num1 - num2
+            st.session_state.expression=str(result)
 
-            elif operation == "곱셈":
-                result = num1 * num2
+            st.session_state.result=str(result)
 
-            elif operation == "나눗셈":
-                if num2 == 0:
-                    st.error("0으로 나눌 수 없습니다.")
-                    st.stop()
-                result = num1 / num2
+        except:
 
-            elif operation == "모듈러 연산":
-                if num2 == 0:
-                    st.error("0으로 나눈 나머지는 계산할 수 없습니다.")
-                    st.stop()
-                result = num1 % num2
+            st.session_state.result="Error"
 
-            elif operation == "지수 연산":
-                result = num1 ** num2
-
-            st.success(f"결과: {result}")
-
-        except Exception as e:
-            st.error(f"오류 발생: {e}")
+if st.session_state.result!="":
+    st.success(f"결과 : {st.session_state.result}")
