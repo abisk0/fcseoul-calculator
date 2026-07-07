@@ -46,15 +46,19 @@ st.markdown("""
 /* 버튼 */
 .stButton>button{
     width:100%;
-    height:95px;              /* 기존 70 → 95 */
+    height:95px;
     border-radius:18px;
     border:none;
-    font-size:28px;           /* 기존 22 → 28 */
+    font-size:48px;
     font-weight:bold;
     background:#ffffff;
     color:#333;
     transition:all .2s ease;
     box-shadow:0 4px 10px rgba(0,0,0,.15);
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 /* Hover */
